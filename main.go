@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -25,7 +26,19 @@ func main() {
 		}
 		tmpl.Execute(w, films)
 	}
+
+	h2 := func(w http.ResponseWriter, r *http.Request) {
+		title := r.PostFormValue("title")
+		director := r.PostFormValue("director")
+
+		htmlStr := fmt.Sprintf("<li class='list-group-item bg-primary text-white'> %s - %s </li>", title, director)
+		template.New("t").Parse(htmlStr)
+		tmpl, _ := template.New("t").Parse(htmlStr)
+		tmpl.Execute(w, nil)
+	}
+
 	http.HandleFunc("/", h1)
+	http.HandleFunc("/add-film/", h2)
 
 	log.Fatal(http.ListenAndServe(":8008", nil))
 }
